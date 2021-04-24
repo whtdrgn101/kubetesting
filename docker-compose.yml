@@ -1,0 +1,24 @@
+version: '3.7'
+
+services:
+  web:
+    container_name: propensity-to-sell-service
+    build: ./services/web
+    image: propentity-to-sell-service:latest
+    command: gunicorn --bind 0.0.0.0:5000 manage:app
+    expose:
+      - 5000
+    env_file:
+      - ./.env.dev
+  nginx:
+    container_name: propentity-to-sell-proxy
+    build: ./services/nginx
+    image: propentity-to-sell-proxy:latest
+    ports:
+      - 1337:80
+    depends_on:
+      - web
+
+networks:
+  default:
+    name: propensity-to-sell-network

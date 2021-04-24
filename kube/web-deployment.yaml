@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: web
+  name: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: web
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/propensity-to-sell-network: "true"
+        io.kompose.service: web
+    spec:
+      containers:
+        - args:
+            - gunicorn
+            - --bind
+            - 0.0.0.0:5000
+            - manage:app
+          env:
+            - name: APP_FOLDER
+              valueFrom:
+                configMapKeyRef:
+                  key: APP_FOLDER
+                  name: env-dev
+            - name: FLASK_APP
+              valueFrom:
+                configMapKeyRef:
+                  key: FLASK_APP
+                  name: env-dev
+            - name: FLASK_ENV
+              valueFrom:
+                configMapKeyRef:
+                  key: FLASK_ENV
+                  name: env-dev
+          image: propentity-to-sell-service:latest
+          imagePullPolicy: Never
+          name: propensity-to-sell-service
+          ports:
+            - containerPort: 5000
+          resources: {}
+      restartPolicy: Always
+status: {}
