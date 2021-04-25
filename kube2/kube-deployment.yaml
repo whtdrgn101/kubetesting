@@ -1,22 +1,35 @@
+apiVersion: v1
+data:
+  APP_FOLDER: /usr/src/app
+  FLASK_APP: project/__init__.py
+  FLASK_ENV: development
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: web-env-dev
+  name: env-dev
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: propensity-to-sell-model
-  name: propensity-to-sell-model
+    app: propensity-to-sell-nginx
+  name: propensity-to-sell-nginx
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
-      app: propensity-to-sell-model
+      app: propensity-to-sell-nginx
   strategy: {}
   template:
     metadata:
       labels:
-        app: propensity-to-sell-model
+        app: propensity-to-sell-nginx
     spec:
       containers:
-        - args:
+        - name: propensity-to-sell-model
+          args:
             - gunicorn
             - --bind
             - 0.0.0.0:5000
@@ -38,11 +51,27 @@ spec:
                   key: FLASK_ENV
                   name: env-dev
           image: propentity-to-sell-service:latest
-          terminationMessagePath: "/tmp/my-log"
           imagePullPolicy: Never
-          name: propensity-to-sell-service
           ports:
             - containerPort: 5000
+        - name: propentity-to-sell-proxy
+          image: propentity-to-sell-proxy:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
           resources: {}
       restartPolicy: Always
 status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: propensity-to-sell-nginx
+spec:
+  type: LoadBalancer
+  ports:
+    - name: "1337"
+      port: 1337
+      targetPort: 80
+  selector:
+    app: propensity-to-sell-nginx
