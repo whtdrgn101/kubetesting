@@ -1,35 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: ./kompose convert
-    kompose.version: 1.22.0 (955b78124)
-  creationTimestamp: null
   labels:
-    io.kompose.service: nginx
-  name: nginx
+    app: propensity-to-sell-nginx
+  name: propensity-to-sell-nginx
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
-      io.kompose.service: nginx
+      app: propensity-to-sell-nginx
   strategy: {}
   template:
     metadata:
-      annotations:
-        kompose.cmd: ./kompose convert
-        kompose.version: 1.22.0 (955b78124)
-      creationTimestamp: null
       labels:
-        io.kompose.network/propensity-to-sell-network: "true"
-        io.kompose.service: nginx
+        app: propensity-to-sell-nginx
     spec:
       containers:
         - image: propentity-to-sell-proxy:latest
           imagePullPolicy: Never
           name: propentity-to-sell-proxy
           ports:
-            - containerPort: 1337
+            - containerPort: 80
           resources: {}
       restartPolicy: Always
 status: {}

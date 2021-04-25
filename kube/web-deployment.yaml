@@ -1,28 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: ./kompose convert
-    kompose.version: 1.22.0 (955b78124)
-  creationTimestamp: null
   labels:
-    io.kompose.service: web
-  name: web
+    app: propensity-to-sell-model
+  name: propensity-to-sell-model
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
-      io.kompose.service: web
+      app: propensity-to-sell-model
   strategy: {}
   template:
     metadata:
-      annotations:
-        kompose.cmd: ./kompose convert
-        kompose.version: 1.22.0 (955b78124)
-      creationTimestamp: null
       labels:
-        io.kompose.network/propensity-to-sell-network: "true"
-        io.kompose.service: web
+        app: propensity-to-sell-model
     spec:
       containers:
         - args:
@@ -47,6 +38,7 @@ spec:
                   key: FLASK_ENV
                   name: env-dev
           image: propentity-to-sell-service:latest
+          terminationMessagePath: "/tmp/my-log"
           imagePullPolicy: Never
           name: propensity-to-sell-service
           ports:
